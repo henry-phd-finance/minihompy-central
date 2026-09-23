@@ -7,6 +7,7 @@ import { validateHandle, validateRelativePath } from "../_shared/validation.js";
 import { ApiError } from "../_shared/auth-proof.js";
 import { SECURE_PATHS, handleSecureAuth } from "./secure-auth.js";
 import { WRITING_PATHS, handleWritingAuth, writingSessionActive } from "./writing-auth.js";
+import { isNavigationRequest, handleNavigation, safeNavigationSite } from "./navigation.js";
 import { signToken, verifyToken } from "../_shared/tokens.js";
 
 function getEnv(key) {
@@ -131,7 +132,7 @@ export async function handleIdentityApiRequest(req, options) {
   // 1. GET /health - open to all origins without CORS restrictions
   if (path === "/health" && req.method === "GET") {
     return new Response(
-      JSON.stringify({ status: "ok", identity_protocol: 2, writing_protocol: 1, timestamp: new Date().toISOString() }),
+      JSON.stringify({ status: "ok", identity_protocol: 2, writing_protocol: 1, navigation_protocol: 1, timestamp: new Date().toISOString() }),
       {
         status: 200,
         headers: {
@@ -177,6 +178,10 @@ export async function handleIdentityApiRequest(req, options) {
   };
 
   try {
+    if (isNavigationRequest(path, url.searchParams)) {
+      const result = await handleNavigation(req, path, supabase);
+      return new Response(JSON.stringify(result.body), { status: result.status, headers });
+    }
     const secret = path === "/directory" ? null : getCentralSecret(options);
     if (WRITING_PATHS.has(path)) {
       const result = await handleWritingAuth(req, path, { db: supabase, secret });
@@ -212,6 +217,7 @@ export async function handleIdentityApiRequest(req, options) {
       if (handleParam) {
         let normalizedHandle;
         try {
+          if (handleParam.length > 100) throw Error("handle이 너무 깁니다.");
           normalizedHandle = validateHandle(handleParam);
         } catch (e) {
           return new Response(
@@ -236,7 +242,7 @@ export async function handleIdentityApiRequest(req, options) {
         members = data || [];
       } else if (queryParam) {
         const trimmed = queryParam.trim();
-        if (trimmed.length < 2 || trimmed.length > 30 || /[\u0000-\u001f\u007f]/u.test(trimmed)) {
+        if (queryParam.length > 100 || trimmed.length < 2 || trimmed.length > 30 || /[\u0000-\u001f\u007f]/u.test(trimmed)) {
           return new Response(
             JSON.stringify({ error: "검색어는 제어 문자 없이 2~30자로 입력해야 합니다." }),
             { status: 400, headers }
@@ -268,7 +274,7 @@ export async function handleIdentityApiRequest(req, options) {
       const memberIds = members.map((m) => m.id);
       const { data: sites, error: sitesError } = await supabase
         .from("identity_sites")
-        .select("member_id, homepage_url")
+        .select("member_id, homepage_url, origin, base_path")
         .eq("status", "active")
         .eq("verification_status", "verified")
         .in("member_id", memberIds);
@@ -282,7 +288,7 @@ export async function handleIdentityApiRequest(req, options) {
       }
 
       const siteMap = new Map(
-        (sites || []).map((s) => [s.member_id, s.homepage_url])
+        (sites || []).filter(safeNavigationSite).map((s) => [s.member_id, s.homepage_url])
       );
 
       // Only include members with an active homepage_url

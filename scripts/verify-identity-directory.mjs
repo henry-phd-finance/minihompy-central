@@ -222,15 +222,7 @@ console.log('\n3. Testing path normalization for Supabase Functions...');
 // --- Test 4: Input Validation for GET /directory ---
 console.log('\n4. Testing input validation for GET /directory...');
 {
-  // 4.1 Missing both handle and q -> 400 Bad Request
-  const reqMissing = new Request('https://central.api/directory', {
-    method: 'GET',
-    headers: { Origin: 'https://alice.github.io' },
-  });
-  const resMissing = await handleIdentityApiRequest(reqMissing, options);
-  assert.equal(resMissing.status, 400);
-  const missingBody = await resMissing.json();
-  assert.match(missingBody.error, /handle 또는 검색어/);
+  // Search-free paginated browsing is tested against actual SQL in verify-member-navigation.mjs.
 
   // 4.2 Invalid handle format (contains invalid characters) -> 400
   const reqInvalidHandle = new Request('https://central.api/directory?handle=INVALID_HANDLE!', {
@@ -248,7 +240,7 @@ console.log('\n4. Testing input validation for GET /directory...');
   const resShortQ = await handleIdentityApiRequest(reqShortQ, options);
   assert.equal(resShortQ.status, 400);
 
-  console.log('   ✓ Input validation prevents full table dump and enforces valid handle/query formats.');
+  console.log('   ✓ Legacy search validation enforces valid handle/query formats.');
 }
 
 // --- Test 5: Exact Handle Query & Public Profile Schema Compliance ---

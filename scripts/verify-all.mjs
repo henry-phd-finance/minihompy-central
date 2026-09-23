@@ -13,6 +13,7 @@ const suites = [
   { name: 'Runtime source consistency', file: 'verify-runtime-source.mjs' },
   { name: 'Deployment prerequisites', file: 'verify-deployment.mjs' },
   { name: 'Protocol & Token Security', file: 'verify-shared-identity-protocol.mjs' },
+  { name: 'Member navigation (SQL)', file: 'verify-member-navigation.mjs' },
   { name: 'Step C2: Directory & CORS', file: 'verify-identity-directory.mjs' },
   { name: 'Verified registration, Auth proof & single-use login (SQL)', file: 'verify-identity-security.mjs' },
   { name: 'Member writing proof, grants and logout (SQL)', file: 'verify-member-writing.mjs' },
