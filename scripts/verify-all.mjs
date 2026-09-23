@@ -15,6 +15,8 @@ const suites = [
   { name: 'Protocol & Token Security', file: 'verify-shared-identity-protocol.mjs' },
   { name: 'Step C2: Directory & CORS', file: 'verify-identity-directory.mjs' },
   { name: 'Verified registration, Auth proof & single-use login (SQL)', file: 'verify-identity-security.mjs' },
+  { name: 'Member writing proof, grants and logout (SQL)', file: 'verify-member-writing.mjs' },
+  { name: 'Writing logout UI failure recovery', file: 'verify-writing-logout-ui.mjs' },
   { name: 'Existing identity migration', file: 'verify-identity-upgrade.mjs' },
   { name: 'Step C5: Visits Issue', file: 'verify-identity-visit-issue.mjs' },
   { name: 'Step C6: Visits Resolve', file: 'verify-identity-visit-resolve.mjs' },

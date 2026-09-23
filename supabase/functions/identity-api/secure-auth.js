@@ -141,7 +141,8 @@ export async function handleSecureAuth(req, path, { db, secret, fetcher = fetch 
       p_activation_id: ticket.jti, p_member: ticket.sub, p_site: ticket.site_id, p_challenge: await sha256(body.code_verifier),
     });
     const centralSession = await signToken({ kind: 'central_session', sub: attempt.member_id, session_version: attempt.session_version,
-      iat: now, exp: now + 30 * 86400 }, secret);
+      central_session_id: attempt.central_session_id,
+      iat: now, exp: Math.floor(Date.parse(attempt.session_expires_at) / 1000) }, secret);
     return { status: 200, body: {
       central_session: centralSession, session_key: 'minihompy.identity.session.v1',
       user: { id: attempt.member_id, handle: attempt.handle, display_name: attempt.display_name },

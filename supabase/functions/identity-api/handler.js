@@ -6,6 +6,7 @@ import { getCorsHeaders, handleCorsPreflight } from "../_shared/cors.js";
 import { validateHandle, validateRelativePath } from "../_shared/validation.js";
 import { ApiError } from "../_shared/auth-proof.js";
 import { SECURE_PATHS, handleSecureAuth } from "./secure-auth.js";
+import { WRITING_PATHS, handleWritingAuth, writingSessionActive } from "./writing-auth.js";
 import { signToken, verifyToken } from "../_shared/tokens.js";
 
 function getEnv(key) {
@@ -130,7 +131,7 @@ export async function handleIdentityApiRequest(req, options) {
   // 1. GET /health - open to all origins without CORS restrictions
   if (path === "/health" && req.method === "GET") {
     return new Response(
-      JSON.stringify({ status: "ok", identity_protocol: 2, timestamp: new Date().toISOString() }),
+      JSON.stringify({ status: "ok", identity_protocol: 2, writing_protocol: 1, timestamp: new Date().toISOString() }),
       {
         status: 200,
         headers: {
@@ -177,6 +178,10 @@ export async function handleIdentityApiRequest(req, options) {
 
   try {
     const secret = path === "/directory" ? null : getCentralSecret(options);
+    if (WRITING_PATHS.has(path)) {
+      const result = await handleWritingAuth(req, path, { db: supabase, secret });
+      return new Response(JSON.stringify(result.body), { status: result.status, headers });
+    }
     if (SECURE_PATHS.has(path) && req.method === 'POST') {
       const result = await handleSecureAuth(req, path, { db: supabase, secret, fetcher: options?.fetcher });
       return new Response(JSON.stringify(result.body), { status: result.status, headers });
@@ -361,6 +366,7 @@ export async function handleIdentityApiRequest(req, options) {
       const now = Math.floor(Date.now() / 1000);
       let identifiedMemberId = null;
       let identifiedSessionVersion = null;
+      let identifiedSessionId = null;
       let sessionStatus = "anonymous";
       let sessionInvalid = false;
 
@@ -382,9 +388,10 @@ export async function handleIdentityApiRequest(req, options) {
             const { data: ownerSite, error: ownerSiteError } = await supabase.from("identity_sites")
               .select("id").eq("member_id", member.id).eq("status", "active")
               .eq("verification_status", "verified").maybeSingle();
-            if (ownerSite && !ownerSiteError) {
+            if (ownerSite && !ownerSiteError && await writingSessionActive(supabase, sessionPayload)) {
               identifiedMemberId = member.id;
               identifiedSessionVersion = member.session_version;
+              identifiedSessionId = sessionPayload.central_session_id || null;
               sessionStatus = "identified";
             } else { sessionInvalid = true; }
           } else {
@@ -400,6 +407,7 @@ export async function handleIdentityApiRequest(req, options) {
         kind: "visit_ticket",
         sub: identifiedMemberId,
         session_version: identifiedSessionVersion,
+        ...(identifiedSessionId ? { central_session_id: identifiedSessionId } : {}),
         aud: targetSite.id,
         attempt_id: actualAttemptId,
         return_path: validatedReturnPath,
@@ -531,7 +539,7 @@ export async function handleIdentityApiRequest(req, options) {
         .eq("status", "active")
         .maybeSingle();
 
-      if (memberError || !member || ticketPayload.session_version !== member.session_version) {
+      if (memberError || !member || ticketPayload.session_version !== member.session_version || !await writingSessionActive(supabase, ticketPayload)) {
         // 사용자가 탈퇴 또는 정지된 경우 안전하게 익명으로 전환
         return new Response(
           JSON.stringify({
@@ -586,6 +594,7 @@ export async function handleIdentityApiRequest(req, options) {
       headers,
     });
   } catch (err) {
+    if (WRITING_PATHS.has(path)) return new Response(JSON.stringify({ error: { code: err.code || (err.status === 400 ? 'BAD_REQUEST' : 'IDENTITY_UNAVAILABLE'), message: '회원 작성 인증을 확인하지 못했습니다.' } }), { status: err.status || 503, headers });
     if (err instanceof ApiError) return new Response(JSON.stringify({ error: err.message }), { status: err.status, headers });
     console.error("Identity API request failed");
     return new Response(
