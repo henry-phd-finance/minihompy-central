@@ -45,4 +45,5 @@
       location.assign(data.redirect_url);
     } catch (error) { clear(); message.textContent = error.message; busy = false; submit.disabled = handle.disabled = false; }
   });
+  if (siteId) submit.disabled = handle.disabled = false;
 })();

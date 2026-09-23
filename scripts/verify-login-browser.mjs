@@ -245,6 +245,19 @@ try {
     assert.ok(result.every(check=>check.passed));
     console.log('PASS: live-login runner exercised through real browser + local SQL; A/B account switch, additional origin, direct navigation, role isolation and logout.');
   }
+  {
+    const {page,context}=await contextFor(); let release;
+    const pending=new Promise(done=>{release=done;});
+    await context.route('**/hub/login.js',async route=>{await pending;await route.fallback();});
+    await page.goto(`${central}/login.html?site_id=${bob.id}`,{waitUntil:'commit'});
+    assert.equal(await page.locator('#handle').isDisabled(),true);
+    assert.equal(await page.locator('#submit').isDisabled(),true);
+    release();
+    await page.waitForFunction(()=>!document.querySelector('#submit').disabled);
+    assert.equal(await page.locator('#handle').isDisabled(),false);
+    await page.close();
+    console.log('PASS: slow central script cannot submit the native form before return-state handling is ready.');
+  }
   for(const req of requests) {
     if(req.body?.includes('browser-password') || req.body?.includes('"password"')) assert.ok([alice,bob].some(site=>req.url.startsWith(`https://${site.ref}.supabase.co/`)),'Password must stay in personal Supabase');
     if(req.url.startsWith(centralApi)) {assert.ok(!req.body?.includes('refresh-'));assert.ok(!req.body?.includes('private-owner@example.test'));assert.ok(!req.body?.includes('browser-password'));}

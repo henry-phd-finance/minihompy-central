@@ -17,9 +17,9 @@
     <p class="description">내 아이디로 미니홈피를 방문하세요.</p>
     <ol class="steps" aria-label="로그인 순서"><li aria-current="step">1. 아이디 확인</li><li>2. 비밀번호 입력</li></ol>
     <form id="login-form">
-      <div class="field"><label for="handle">아이디</label><input id="handle" name="username" autocomplete="username" required pattern="[A-Za-z0-9._-]{2,30}" maxlength="30" autofocus placeholder="내 미니홈피 아이디"></div>
+      <div class="field"><label for="handle">아이디</label><input id="handle" disabled name="username" autocomplete="username" required pattern="[A-Za-z0-9._-]{2,30}" maxlength="30" autofocus placeholder="내 미니홈피 아이디"></div>
       <p id="message" class="message" role="status" aria-live="polite"></p>
-      <button id="submit" type="submit">다음</button>
+      <button id="submit" type="submit" disabled>다음</button>
     </form>
     <button id="cancel" class="secondary" type="button">취소</button>
   </main>
