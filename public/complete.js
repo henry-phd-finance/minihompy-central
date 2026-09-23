@@ -7,7 +7,7 @@
   const pending = flow.read(flow.storage('sessionStorage'), flow.pendingKey);
   const message = document.querySelector('#message'), restart = document.querySelector('#restart'), back = document.querySelector('#return');
   if (pending?.siteId) {
-    restart.href = flow.page(config.pageBaseUrl, 'login.html', { site_id: pending.siteId, return_path: pending.returnPath, attempt_id: pending.visitAttemptId || '' }).href;
+    restart.href = flow.page(config.pageBaseUrl, 'login.html', { site_id: pending.siteId, return_path: pending.returnPath, attempt_id: pending.visitAttemptId || '', ...(pending.writingProtocol==='2'?{writing_protocol:'2',code_challenge:pending.writingChallenge}:{}) }).href;
     if (pending.returnUrl) { back.href = pending.returnUrl; back.hidden = false; }
   }
   try {
@@ -24,7 +24,7 @@
       if (localStorage.getItem(flow.sessionKey) !== data.central_session) throw Error();
     } catch { throw Error('로그인 정보를 저장하지 못했습니다. 브라우저 저장소 설정을 확인해 주세요.'); }
     flow.remove(flow.storage('sessionStorage'), flow.pendingKey);
-    location.replace(flow.page(config.pageBaseUrl, 'visit.html', { site_id: data.return_site_id, return_path: data.return_path, attempt_id: pending.visitAttemptId || '' }).href);
+    location.replace(flow.page(config.pageBaseUrl, 'visit.html', { site_id: data.return_site_id, return_path: data.return_path, attempt_id: data.visit_attempt_id || pending.visitAttemptId || '', ...(data.writing_protocol===2?{writing_protocol:'2',code_challenge:data.writing_challenge}:{}) }).href);
   } catch (error) {
     flow.remove(flow.storage('sessionStorage'), flow.pendingKey);
     message.textContent = error.message;

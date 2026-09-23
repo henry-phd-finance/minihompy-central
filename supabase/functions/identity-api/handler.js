@@ -4,7 +4,7 @@
 
 import { getCorsHeaders, handleCorsPreflight } from "../_shared/cors.js";
 import { validateHandle, validateRelativePath } from "../_shared/validation.js";
-import { ApiError } from "../_shared/auth-proof.js";
+import { ApiError, readBody } from "../_shared/auth-proof.js";
 import { SECURE_PATHS, handleSecureAuth } from "./secure-auth.js";
 import { WRITING_PATHS, handleWritingAuth, writingSessionActive } from "./writing-auth.js";
 import { isNavigationRequest, handleNavigation, safeNavigationSite } from "./navigation.js";
@@ -132,7 +132,7 @@ export async function handleIdentityApiRequest(req, options) {
   // 1. GET /health - open to all origins without CORS restrictions
   if (path === "/health" && req.method === "GET") {
     return new Response(
-      JSON.stringify({ status: "ok", identity_protocol: 2, writing_protocol: 1, navigation_protocol: 1, timestamp: new Date().toISOString() }),
+      JSON.stringify({ status: "ok", identity_protocol: 2, writing_protocol: 1, member_session_protocol: 2, navigation_protocol: 1, timestamp: new Date().toISOString() }),
       {
         status: 200,
         headers: {
@@ -318,7 +318,7 @@ export async function handleIdentityApiRequest(req, options) {
 
       let body;
       try {
-        body = await req.json();
+        body = await readBody(req);
       } catch {
         return new Response(JSON.stringify({ error: "유효한 JSON 요청 본문이 필요합니다." }), {
           status: 400,
@@ -326,8 +326,11 @@ export async function handleIdentityApiRequest(req, options) {
         });
       }
 
-      const { central_session, target_site_id, site_id, return_path, attempt_id } = body || {};
+      const { central_session, target_site_id, site_id, return_path, attempt_id, writing_protocol, code_challenge } = body || {};
       const actualSiteId = target_site_id || site_id;
+      if (writing_protocol !== undefined && (writing_protocol !== 2 || typeof code_challenge !== 'string' || !/^[A-Za-z0-9_-]{43}$/.test(code_challenge) || typeof attempt_id !== 'string' || !attempt_id || attempt_id.length>128 || /[\u0000-\u001f\u007f]/.test(attempt_id))) {
+        return new Response(JSON.stringify({error:'Invalid writing protocol parameters'}),{status:400,headers});
+      }
 
       if (!actualSiteId || typeof actualSiteId !== "string") {
         return new Response(
@@ -385,6 +388,7 @@ export async function handleIdentityApiRequest(req, options) {
             .eq("id", sessionPayload.sub)
             .maybeSingle();
 
+          if (writing_protocol===2 && memberError) throw new ApiError(503,'방문자 확인 서버에 연결하지 못했습니다.');
           if (
             !memberError &&
             member &&
@@ -394,7 +398,8 @@ export async function handleIdentityApiRequest(req, options) {
             const { data: ownerSite, error: ownerSiteError } = await supabase.from("identity_sites")
               .select("id").eq("member_id", member.id).eq("status", "active")
               .eq("verification_status", "verified").maybeSingle();
-            if (ownerSite && !ownerSiteError && await writingSessionActive(supabase, sessionPayload)) {
+            if(writing_protocol===2 && ownerSiteError) throw new ApiError(503,'방문자 확인 서버에 연결하지 못했습니다.');
+            if (ownerSite && !ownerSiteError && await writingSessionActive(supabase, sessionPayload, writing_protocol===2)) {
               identifiedMemberId = member.id;
               identifiedSessionVersion = member.session_version;
               identifiedSessionId = sessionPayload.central_session_id || null;
@@ -403,7 +408,8 @@ export async function handleIdentityApiRequest(req, options) {
           } else {
             sessionInvalid = true;
           }
-        } catch {
+        } catch (e) {
+          if(writing_protocol===2 && e instanceof ApiError && e.status===503) throw e;
           sessionInvalid = true;
         }
       }
@@ -432,6 +438,10 @@ export async function handleIdentityApiRequest(req, options) {
       fragmentParams.set("vt", visitTicket);
       if (validatedReturnPath) {
         fragmentParams.set("path", validatedReturnPath);
+      }
+      if (writing_protocol === 2 && sessionStatus === 'identified') {
+        const issued = await handleWritingAuth(new Request(req.url,{method:'POST',body:JSON.stringify({central_session,target_site_id:actualSiteId,return_path:validatedReturnPath,code_challenge,protocol:2,attempt_id:actualAttemptId})}),'/writing-proofs/issue',{db:supabase,secret});
+        fragmentParams.set('wp',issued.body.writing_proof);
       }
       const returnUrl = `${baseReturnUrl}#${fragmentParams.toString()}`;
 
@@ -600,7 +610,7 @@ export async function handleIdentityApiRequest(req, options) {
       headers,
     });
   } catch (err) {
-    if (WRITING_PATHS.has(path)) return new Response(JSON.stringify({ error: { code: err.code || (err.status === 400 ? 'BAD_REQUEST' : 'IDENTITY_UNAVAILABLE'), message: '회원 작성 인증을 확인하지 못했습니다.' } }), { status: err.status || 503, headers });
+    if (WRITING_PATHS.has(path)) return new Response(JSON.stringify({ error: { code: err.code || (err.status === 400 ? 'BAD_REQUEST' : 'IDENTITY_UNAVAILABLE'), message: '회원 작성 인증을 확인하지 못했습니다.' } }), { status: err.status || 503, headers: {...headers,...(err.status===429?{'Retry-After':'1'}:{})} });
     if (err instanceof ApiError) return new Response(JSON.stringify({ error: err.message }), { status: err.status, headers });
     console.error("Identity API request failed");
     return new Response(

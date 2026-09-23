@@ -36,6 +36,7 @@
       const data = await flow.post(config.apiBaseUrl, 'visits/issue', {
         central_session: session, target_site_id: siteId,
         return_path: params.get('return_path') || '/', attempt_id: params.get('attempt_id') || '',
+        ...(document.body.dataset.action!=='logout' && params.get('writing_protocol')==='2'?{writing_protocol:2,code_challenge:params.get('code_challenge')}:{}),
       });
       if (data.session_invalid) {
         try { localStorage.removeItem(flow.sessionKey); if (localStorage.getItem(flow.sessionKey) !== null) throw Error(); }

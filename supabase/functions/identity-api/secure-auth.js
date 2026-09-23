@@ -93,9 +93,13 @@ export async function handleSecureAuth(req, path, { db, secret, fetcher = fetch 
     let returnPath;
     try { returnPath = validateRelativePath(body.return_path || '', returnSite.base_path); }
     catch { throw new ApiError(400, '복귀 경로가 올바르지 않습니다.'); }
-    const attempt = await rpc(db, 'identity_create_login_attempt', {
+    const writing=body.writing_protocol===2;
+    if(body.writing_protocol!==undefined && !writing) throw new ApiError(400,'지원하지 않는 작성 인증 방식입니다.');
+    if(writing && (!CHALLENGE.test(body.writing_challenge||'') || typeof body.visit_attempt_id!=='string' || !body.visit_attempt_id || body.visit_attempt_id.length>128 || /[\u0000-\u001f\u007f]/.test(body.visit_attempt_id))) throw new ApiError(400,'작성 인증 요청이 올바르지 않습니다.');
+    const attempt = await rpc(db, writing?'identity_create_login_attempt_writing':'identity_create_login_attempt', {
       p_member: member.id, p_site: site.id, p_return_site: returnSite.id,
       p_return_path: returnPath, p_challenge: body.code_challenge,
+      ...(writing?{p_writing_challenge:body.writing_challenge,p_visit_attempt:body.visit_attempt_id}:{}),
     });
     const intent = await signToken({ kind: 'login_intent', jti: attempt.id, sub: member.id, site_id: site.id,
       return_site_id: returnSite.id, return_path: returnPath, iat: now, exp: Math.floor(Date.parse(attempt.intent_expires_at) / 1000) }, secret);
@@ -148,6 +152,7 @@ export async function handleSecureAuth(req, path, { db, secret, fetcher = fetch 
       user: { id: attempt.member_id, handle: attempt.handle, display_name: attempt.display_name },
       return_site_id: attempt.return_site_id, return_path: attempt.return_path,
       return_url: new URL(attempt.return_path, attempt.return_origin).href,
+      ...(attempt.writing_challenge?{writing_protocol:2,writing_challenge:attempt.writing_challenge,visit_attempt_id:attempt.visit_attempt_id}:{}),
     } };
   }
   throw new ApiError(404, 'Not Found');

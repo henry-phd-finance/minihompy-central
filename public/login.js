@@ -9,7 +9,7 @@
   function clear() { flow.remove(flow.storage('sessionStorage'), flow.pendingKey); }
   function goBack() {
     cancelled = true; clear();
-    if (pending?.returnUrl && pending.visitAttemptId) { location.replace(flow.page(config.pageBaseUrl, 'visit.html', {site_id: pending.siteId, return_path: pending.returnPath, attempt_id: pending.visitAttemptId}).href); return; }
+    if (pending?.returnUrl && pending.visitAttemptId) { location.replace(flow.page(config.pageBaseUrl, 'visit.html', {site_id: pending.siteId, return_path: pending.returnPath, attempt_id: pending.visitAttemptId, ...(pending.writingProtocol==='2'?{writing_protocol:'2',code_challenge:pending.writingChallenge}:{})}).href); return; }
     if (pending?.returnUrl) { location.replace(pending.returnUrl); return; }
     if (history.length > 1) { history.back(); return; }
     message.textContent = '로그인을 취소했습니다. 미니홈피로 돌아가 주세요.';
@@ -32,11 +32,12 @@
     busy = true; submit.disabled = handle.disabled = true; message.textContent = '아이디를 확인하고 있습니다.';
     try {
       const verifier = flow.random();
-      pending = { verifier, siteId, returnPath, visitAttemptId: params.get('attempt_id') || (prior?.siteId === siteId && prior?.returnPath === returnPath ? prior.visitAttemptId : null), deadline: Date.now() + 7 * 60 * 1000 };
+      pending = { verifier, siteId, returnPath, writingProtocol:params.get('writing_protocol'), writingChallenge:params.get('code_challenge'), visitAttemptId: params.get('attempt_id') || (prior?.siteId === siteId && prior?.returnPath === returnPath ? prior.visitAttemptId : null), deadline: Date.now() + 7 * 60 * 1000 };
       flow.save(flow.storage('sessionStorage'), flow.pendingKey, pending);
       const data = await flow.post(config.apiBaseUrl, 'login-intents', {
         handle: handle.value.trim().toLowerCase(), return_site_id: siteId, return_path: returnPath,
         code_challenge: await flow.challenge(verifier),
+        ...(params.get('writing_protocol')==='2'?{writing_protocol:2,writing_challenge:params.get('code_challenge'),visit_attempt_id:pending.visitAttemptId}:{}),
       });
       if (cancelled) return;
       if (!data.attempt_id || !data.redirect_url || !data.return_url) throw Error('로그인 응답을 확인하지 못했습니다.');
