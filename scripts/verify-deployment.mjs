@@ -3,7 +3,7 @@ import { EventEmitter } from 'node:events';
 import { deployCentral } from './deploy-functions.mjs';
 const env={CENTRAL_PROJECT_REF:'a'.repeat(20),CENTRAL_ORIGIN:'https://central.github.io',CENTRAL_PAGE_URL:'https://central.github.io/hub',CENTRAL_TOKEN_SECRET:'s'.repeat(32),SUPABASE_ACCESS_TOKEN:'private-management'};
 let ready=false;const requests=[],commands=[],logs=[];
-const fetcher=async(url,options)=>{requests.push({url,options});return Response.json(url.endsWith('/database/query')?[{ready}]:{});};
+const fetcher=async(url,options)=>{requests.push({url,options});return url.endsWith('/database/query')?Response.json([{ready}]):new Response(null,{status:204});};
 const runner=(command,args,options)=>{commands.push({command,args,options});const child=new EventEmitter();queueMicrotask(()=>child.emit('close',0));return child;};
 const options={env,fetcher,runner,log:m=>logs.push(m)};
 await deployCentral(options);assert.equal(requests.length,0);assert.equal(commands.length,0);

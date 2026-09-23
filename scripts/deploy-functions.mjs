@@ -13,7 +13,7 @@ export async function deployCentral({ env=process.env, apply=false, fetcher=fetc
     try {response=await fetcher(`https://api.supabase.com/v1/projects/${ref}/${path}`,{method:'POST',headers:{Authorization:`Bearer ${token}`,'Content-Type':'application/json'},body:JSON.stringify(body),redirect:'error',signal:AbortSignal.timeout(30000)});}
     catch{throw Error('중앙 관리 API 연결에 실패했습니다.');}
     if(!response.ok)throw Error(`중앙 관리 API 실패 (HTTP ${response.status}).`);
-    return response.json();
+    return response.json().catch(() => null);
   }
   const [schema]=await call('database/query',{query:"select exists(select 1 from information_schema.columns where table_schema='private' and table_name='identity_sites' and column_name='verification_status') and to_regprocedure('private.identity_verify_registration(uuid,uuid)') is not null and to_regclass('private.identity_login_attempts') is not null as ready"});
   if(!schema?.ready)throw Error('중앙 v2 마이그레이션을 먼저 적용해야 합니다. Secrets/함수는 변경하지 않았습니다.');
