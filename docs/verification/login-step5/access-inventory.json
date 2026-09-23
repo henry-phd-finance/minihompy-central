@@ -1,0 +1,43 @@
+{
+  "checkedAt": "2026-09-23T04:46:21.050Z",
+  "mode": "read-only",
+  "projects": [
+    {
+      "ref": "pcwovvdgggpbghvqraex",
+      "managementStatus": 200
+    },
+    {
+      "ref": "itkymmxnbjylyzbmdxdb",
+      "managementStatus": 403
+    },
+    {
+      "ref": "zcaodcujqbjrogffwalk",
+      "managementStatus": 403
+    }
+  ],
+  "repositories": [
+    {
+      "repo": "henry-phd-finance/minihompy",
+      "accessible": true,
+      "push": true,
+      "admin": true,
+      "defaultBranch": "main"
+    },
+    {
+      "repo": "henry-phd-finance/minihompy-central",
+      "accessible": false
+    },
+    {
+      "repo": "henry-hs-jung/minihompy",
+      "accessible": true,
+      "push": false,
+      "admin": false,
+      "defaultBranch": "main"
+    }
+  ],
+  "centralSchema": {
+    "v2_schema": false,
+    "site_count": 2
+  },
+  "remoteMutations": 0
+}

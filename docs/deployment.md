@@ -1,6 +1,6 @@
 # 중앙 v2 배포와 기존 사이트 전환
 
-2026-09-23, 4단계 도구 구현 기준. 이 저장소의 이번 검수는 로컬 코드/SQL/모의 HTTP만 사용했으며 실제 DB와 배포는 변경하지 않았다.
+2026-09-23, 4단계 도구 구현 기준. 초기 4단계 검수 후 5단계에서 실제 중앙 DB/함수/Pages와 A/B 전환을 완료했다. [최종 검수](verification/login-step5/README.md). 아래는 이후 배포에도 사용하는 절차이며, 이미 적용한 마이그레이션은 반복하지 않는다.
 
 ## DB: 기존 데이터를 보존하는 1회 업그레이드
 
@@ -57,4 +57,4 @@ npx deno check --no-lock --node-modules-dir=none supabase/functions/identity-api
 
 JS가 인증 구현의 단일 원본이며 Deno의 TS handler와 공통 모듈은 JS 재내보내기만 한다. `verify-runtime-source.mjs`가 어댑터 외 구현의 재등장을 검사한다. Node 검사와 운영 Deno는 같은 JS를 실행한다. `npm test`는 이 검사와 배포 사전조건 검사까지 포함한 10개 묶음이다.
 
-개인/중앙 CLI 배포 쓰기 검사는 모의 HTTP/프로세스로 수행했다. 실제 Supabase Management API 응답, 개인 계정 생성/Secrets/함수 배포, Actions와 공개 Pages 반영은 5단계에서 별도로 확인한다.
+개인/중앙 CLI 배포 쓰기 검사는 모의 HTTP/프로세스로 수행했다. 5단계에서 실제 Management API, Secrets/함수 배포, Actions/Pages와 기존 A/B 계정 인증을 별도로 확인했다. 신규 개인 계정 생성은 기존 계정을 보존하기 위해 실행하지 않았다.

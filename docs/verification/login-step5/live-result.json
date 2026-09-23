@@ -1,0 +1,208 @@
+{
+  "checkedAt": "2026-09-23T05:04:47.204Z",
+  "mode": "live-login",
+  "checks": [
+    {
+      "name": "central v2 protocol",
+      "url": "https://pcwovvdgggpbghvqraex.supabase.co/functions/v1/identity-api/health",
+      "status": 200,
+      "passed": true
+    },
+    {
+      "name": "central runtime login.html",
+      "url": "https://henry-phd-finance.github.io/minihompy-central/login.html",
+      "status": 200,
+      "passed": true
+    },
+    {
+      "name": "central runtime login.js",
+      "url": "https://henry-phd-finance.github.io/minihompy-central/login.js",
+      "status": 200,
+      "passed": true
+    },
+    {
+      "name": "central runtime complete.html",
+      "url": "https://henry-phd-finance.github.io/minihompy-central/complete.html",
+      "status": 200,
+      "passed": true
+    },
+    {
+      "name": "central runtime complete.js",
+      "url": "https://henry-phd-finance.github.io/minihompy-central/complete.js",
+      "status": 200,
+      "passed": true
+    },
+    {
+      "name": "central runtime visit.html",
+      "url": "https://henry-phd-finance.github.io/minihompy-central/visit.html",
+      "status": 200,
+      "passed": true
+    },
+    {
+      "name": "central runtime logout.html",
+      "url": "https://henry-phd-finance.github.io/minihompy-central/logout.html",
+      "status": 200,
+      "passed": true
+    },
+    {
+      "name": "central runtime visit-flow.js",
+      "url": "https://henry-phd-finance.github.io/minihompy-central/visit-flow.js",
+      "status": 200,
+      "passed": true
+    },
+    {
+      "name": "central runtime login-flow.js",
+      "url": "https://henry-phd-finance.github.io/minihompy-central/login-flow.js",
+      "status": 200,
+      "passed": true
+    },
+    {
+      "name": "central public configuration",
+      "url": "https://henry-phd-finance.github.io/minihompy-central/config.js",
+      "status": 200,
+      "passed": true
+    },
+    {
+      "name": "site 1 homepage",
+      "url": "https://henry-phd-finance.github.io/minihompy/",
+      "status": 200,
+      "passed": true
+    },
+    {
+      "name": "site 1 runtime login/index.html",
+      "url": "https://henry-phd-finance.github.io/minihompy/login/",
+      "status": 200,
+      "passed": true
+    },
+    {
+      "name": "site 1 runtime visitor-identity.js",
+      "url": "https://henry-phd-finance.github.io/minihompy/visitor-identity.js",
+      "status": 200,
+      "passed": true
+    },
+    {
+      "name": "site 1 runtime visitor-identity-login.js",
+      "url": "https://henry-phd-finance.github.io/minihompy/visitor-identity-login.js",
+      "status": 200,
+      "passed": true
+    },
+    {
+      "name": "site 1 runtime admin-auth.js",
+      "url": "https://henry-phd-finance.github.io/minihompy/admin-auth.js",
+      "status": 200,
+      "passed": true
+    },
+    {
+      "name": "site 1 runtime assets/login-flow.js",
+      "url": "https://henry-phd-finance.github.io/minihompy/assets/login-flow.js",
+      "status": 200,
+      "passed": true
+    },
+    {
+      "name": "site 1 project mapping",
+      "url": "https://henry-phd-finance.github.io/minihompy/supabase-config.js",
+      "status": 200,
+      "passed": true
+    },
+    {
+      "name": "site 1 central mapping",
+      "url": "https://henry-phd-finance.github.io/minihompy/visitor-identity-config.js",
+      "status": 200,
+      "passed": true
+    },
+    {
+      "name": "site 1 directory",
+      "url": "https://pcwovvdgggpbghvqraex.supabase.co/functions/v1/identity-api/directory?handle=henry91-jung",
+      "status": 200,
+      "passed": true
+    },
+    {
+      "name": "site 2 homepage",
+      "url": "https://henry-hs-jung.github.io/minihompy/",
+      "status": 200,
+      "passed": true
+    },
+    {
+      "name": "site 2 runtime login/index.html",
+      "url": "https://henry-hs-jung.github.io/minihompy/login/",
+      "status": 200,
+      "passed": true
+    },
+    {
+      "name": "site 2 runtime visitor-identity.js",
+      "url": "https://henry-hs-jung.github.io/minihompy/visitor-identity.js",
+      "status": 200,
+      "passed": true
+    },
+    {
+      "name": "site 2 runtime visitor-identity-login.js",
+      "url": "https://henry-hs-jung.github.io/minihompy/visitor-identity-login.js",
+      "status": 200,
+      "passed": true
+    },
+    {
+      "name": "site 2 runtime admin-auth.js",
+      "url": "https://henry-hs-jung.github.io/minihompy/admin-auth.js",
+      "status": 200,
+      "passed": true
+    },
+    {
+      "name": "site 2 runtime assets/login-flow.js",
+      "url": "https://henry-hs-jung.github.io/minihompy/assets/login-flow.js",
+      "status": 200,
+      "passed": true
+    },
+    {
+      "name": "site 2 project mapping",
+      "url": "https://henry-hs-jung.github.io/minihompy/supabase-config.js",
+      "status": 200,
+      "passed": true
+    },
+    {
+      "name": "site 2 central mapping",
+      "url": "https://henry-hs-jung.github.io/minihompy/visitor-identity-config.js",
+      "status": 200,
+      "passed": true
+    },
+    {
+      "name": "site 2 directory",
+      "url": "https://pcwovvdgggpbghvqraex.supabase.co/functions/v1/identity-api/directory?handle=henry-hs-jung",
+      "status": 200,
+      "passed": true
+    }
+  ],
+  "login": {
+    "status": "passed",
+    "checks": [
+      {
+        "name": "A login on B; local B role remains reader",
+        "passed": true
+      },
+      {
+        "name": "B reload keeps A and the original route",
+        "passed": true
+      },
+      {
+        "name": "A to B direct navigation; local administrator remains site-specific",
+        "passed": true
+      },
+      {
+        "name": "Visitor logout and own-site local logout; no silent central login",
+        "passed": true
+      },
+      {
+        "name": "Account switch: B recognized on A without A admin permission",
+        "passed": true
+      },
+      {
+        "name": "Own-site combined logout survives reload",
+        "passed": true
+      },
+      {
+        "name": "No password/refresh-token/email sent to central requests",
+        "passed": true
+      }
+    ]
+  },
+  "passed": true
+}

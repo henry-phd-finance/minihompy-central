@@ -1,0 +1,41 @@
+{
+  "checkedAt": "2026-09-23T05:04:49.721Z",
+  "centralRepository": "https://github.com/henry-phd-finance/minihompy-central",
+  "sites": [
+    {
+      "id": "d81c92b5-3dd0-47be-8b0e-c3af50ac87b8",
+      "verification_status": "verified",
+      "supabase_project_ref": "zcaodcujqbjrogffwalk",
+      "handle": "henry-hs-jung",
+      "session_version": 3,
+      "owner_bound": true
+    },
+    {
+      "id": "afd287c3-0f9f-44b4-8811-3cf11774f859",
+      "verification_status": "verified",
+      "supabase_project_ref": "itkymmxnbjylyzbmdxdb",
+      "handle": "henry91-jung",
+      "session_version": 3,
+      "owner_bound": true
+    }
+  ],
+  "contentMigrationsPerformed": false,
+  "originalLocalHistoryBackupBranch": "pre-deployment-20260923",
+  "runtimeDeployments": [
+    {
+      "repository": "henry-phd-finance/minihompy-central",
+      "commit": "ea89129",
+      "actionsRun": 35820786546
+    },
+    {
+      "repository": "henry-phd-finance/minihompy",
+      "commit": "2a6bc8f",
+      "actionsRun": 35820456122
+    },
+    {
+      "repository": "henry-hs-jung/minihompy",
+      "commit": "7f62442",
+      "actionsRun": 35820486250
+    }
+  ]
+}
