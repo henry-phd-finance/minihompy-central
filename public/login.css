@@ -1,0 +1,21 @@
+:root { font-family: Dotum, '돋움', sans-serif; color: #34454d; background: #edf3f5; font-synthesis: none; }
+* { box-sizing: border-box; }
+body { margin: 0; min-height: 100svh; display: grid; place-items: center; padding: 24px 16px; }
+.login-card { min-height: 560px; width: 100%; max-width: 392px; padding: 32px; background: #fff; border: 1px solid #b7cbd1; border-radius: 16px; box-shadow: 0 8px 28px #45657412; }
+.brand { margin: 0 0 24px; color: #4c8b99; font-size: 12px; font-weight: bold; letter-spacing: 1px; }
+h1 { margin: 0 0 10px; color: #273d46; font-size: 23px; }
+.description { margin: 0 0 28px; font-size: 13px; line-height: 1.7; color: #637a83; }
+.steps { display: flex; gap: 12px; padding: 0 0 14px; margin: 0 0 24px; list-style: none; border-bottom: 1px dashed #cbd9de; font-size: 12px; color: #82959c; }
+.steps [aria-current='step'] { color: #bd571b; font-weight: bold; }
+.field { margin-bottom: 18px; }
+label { display: block; margin-bottom: 8px; font-size: 13px; font-weight: bold; }
+input { width: 100%; min-height: 44px; padding: 10px 12px; border: 1px solid #afc3ca; border-radius: 6px; font: inherit; font-size: 15px; background: white; color: #273d46; }
+input[readonly] { background: #f4f7f8; }
+input:focus { outline: 2px solid #438b9e; outline-offset: 2px; }
+button, .button { display: block; width: 100%; min-height: 44px; border: 0; border-radius: 6px; background: #d96322; color: white; font: inherit; font-size: 14px; font-weight: bold; cursor: pointer; text-align: center; padding: 13px; text-decoration: none; }
+button:disabled { opacity: .55; cursor: wait; }
+button:focus-visible, a:focus-visible { outline: 2px solid #438b9e; outline-offset: 3px; }
+.secondary { background: transparent; color: #547580; font-size: 13px; font-weight: normal; margin-top: 6px; }
+.message { min-height: 20px; margin: 14px 0; font-size: 13px; line-height: 1.65; color: #9b451b; overflow-wrap: anywhere; }
+[hidden] { display: none !important; }
+@media (max-width: 420px) { .login-card { padding: 26px 22px; } }

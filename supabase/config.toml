@@ -1,0 +1,21 @@
+# Central Identity Supabase Configuration
+project_id = "minihompy-central"
+
+[api]
+enabled = true
+port = 54321
+schemas = ["public", "private"]
+
+[db]
+port = 54322
+
+[edge_runtime]
+enabled = true
+port = 54323
+policy = "per_worker"
+
+[functions.identity-api]
+verify_jwt = false
+
+[functions.identity-page]
+verify_jwt = false

@@ -1,0 +1,18 @@
+{
+  "dependencies": {
+    "pg": "^8.23.0"
+  },
+  "devDependencies": {
+    "@electric-sql/pglite": "^0.5.8"
+  },
+  "type": "module",
+  "scripts": {
+    "test": "node scripts/verify-all.mjs",
+    "test:security": "node scripts/verify-identity-security.mjs",
+    "build": "node scripts/build-pages.mjs",
+    "test:artifact": "node scripts/verify-artifact.mjs",
+    "test:runtime": "node scripts/verify-runtime-source.mjs",
+    "test:live-preflight": "node scripts/verify-live-preflight.mjs",
+    "verify:live": "node scripts/verify-live-identity.mjs"
+  }
+}

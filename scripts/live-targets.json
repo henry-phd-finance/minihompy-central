@@ -1,0 +1,20 @@
+{
+  "centralApiUrl": "https://pcwovvdgggpbghvqraex.supabase.co/functions/v1/identity-api",
+  "centralPageUrl": "https://henry-phd-finance.github.io/minihompy-central/",
+  "sites": [
+    {
+      "homepage": "https://henry-phd-finance.github.io/minihompy/",
+      "projectRef": "itkymmxnbjylyzbmdxdb",
+      "siteId": "afd287c3-0f9f-44b4-8811-3cf11774f859",
+      "handle": "henry91-jung",
+      "passwordEnv": "MINIHOMPY_TEST_A_PASSWORD"
+    },
+    {
+      "homepage": "https://henry-hs-jung.github.io/minihompy/",
+      "projectRef": "zcaodcujqbjrogffwalk",
+      "siteId": "d81c92b5-3dd0-47be-8b0e-c3af50ac87b8",
+      "handle": "henry-hs-jung",
+      "passwordEnv": "MINIHOMPY_TEST_B_PASSWORD"
+    }
+  ]
+}

@@ -1,0 +1,15 @@
+import assert from 'node:assert/strict';
+import { EventEmitter } from 'node:events';
+import { deployCentral } from './deploy-functions.mjs';
+const env={CENTRAL_PROJECT_REF:'a'.repeat(20),CENTRAL_ORIGIN:'https://central.github.io',CENTRAL_PAGE_URL:'https://central.github.io/hub',CENTRAL_TOKEN_SECRET:'s'.repeat(32),SUPABASE_ACCESS_TOKEN:'private-management'};
+let ready=false;const requests=[],commands=[],logs=[];
+const fetcher=async(url,options)=>{requests.push({url,options});return Response.json(url.endsWith('/database/query')?[{ready}]:{});};
+const runner=(command,args,options)=>{commands.push({command,args,options});const child=new EventEmitter();queueMicrotask(()=>child.emit('close',0));return child;};
+const options={env,fetcher,runner,log:m=>logs.push(m)};
+await deployCentral(options);assert.equal(requests.length,0);assert.equal(commands.length,0);
+await assert.rejects(deployCentral({...options,apply:true}),/마이그레이션/);assert.equal(requests.length,1);assert.equal(commands.length,0);
+ready=true;await deployCentral({...options,apply:true});assert.equal(commands.length,2);
+assert.ok(commands.every(c=>c.args.includes('--no-verify-jwt') && !JSON.stringify(c.args).includes('private-management')));
+assert.ok(!logs.join('').includes(env.CENTRAL_TOKEN_SECRET));
+await assert.rejects(deployCentral({...options,apply:true,env:{...env,CENTRAL_TOKEN_SECRET:''}}),/서명키/);
+console.log('PASS: central deploy dry-run, schema prerequisite, secret validation, both function targets, credentials excluded from argv/logs.');
