@@ -1,3 +1,4 @@
+import {handleReadContext, readContextReady} from './read-context.js';
 /**
  * Central Identity API Request Handler (ESM)
  */
@@ -133,7 +134,7 @@ export async function handleIdentityApiRequest(req, options) {
   // 1. GET /health - open to all origins without CORS restrictions
   if (path === "/health" && req.method === "GET") {
     return new Response(
-      JSON.stringify({ status: "ok", identity_protocol: 2, writing_protocol: 1, member_session_protocol: 2, navigation_protocol: 1, relationship_protocol: await relationshipReady(await resolveSupabaseClient(options)) ? 1 : 0, timestamp: new Date().toISOString() }),
+      JSON.stringify({ status: "ok", identity_protocol: 2, writing_protocol: 1, member_session_protocol: 2, navigation_protocol: 1, relationship_protocol: await relationshipReady(await resolveSupabaseClient(options)) ? 1 : 0, friend_visibility_protocol: await readContextReady(await resolveSupabaseClient(options)) ? 1 : 0, timestamp: new Date().toISOString() }),
       {
         status: 200,
         headers: {
@@ -180,7 +181,7 @@ export async function handleIdentityApiRequest(req, options) {
 
   try {
     if (path.startsWith("/relationships/")) {
-      const result = await handleRelationships(req, path, {db:supabase, transportPeerIp:options?.transportPeerIp});
+      const result = path === '/relationships/read-context' ? await handleReadContext(req, {db:supabase}) : await handleRelationships(req, path, {db:supabase, transportPeerIp:options?.transportPeerIp});
       return new Response(JSON.stringify(result.body), {status:result.status, headers:{...headers,"Access-Control-Expose-Headers":"Retry-After",...result.headers}});
     }
     if (isNavigationRequest(path, url.searchParams)) {

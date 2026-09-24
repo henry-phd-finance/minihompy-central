@@ -15,6 +15,7 @@ export async function createIdentityDb({ beforeUpgrade } = {}) {
   await pg.exec(await readFile(new URL('../../supabase/migrations/202609230003_member_navigation.sql', import.meta.url), 'utf8'));
   await pg.exec(await readFile(new URL('../../supabase/migrations/202609230004_member_sessions.sql', import.meta.url), 'utf8'));
   await pg.exec(await readFile(new URL('../../supabase/migrations/202609240001_member_relationships.sql', import.meta.url), 'utf8'));
+  await pg.exec(await readFile(new URL('../../supabase/migrations/202609240002_friend_visibility.sql', import.meta.url), 'utf8'));
   // Exercise the actual service_role grants rather than the database owner.
   await pg.exec('set role service_role');
   const execute = async (sql, args) => {
