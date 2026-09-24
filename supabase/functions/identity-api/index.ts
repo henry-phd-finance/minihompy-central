@@ -1,2 +1,3 @@
 import { handleIdentityApiRequest } from "./handler.ts";
-Deno.serve((req) => handleIdentityApiRequest(req));
+// Transport peer may be a shared gateway; do not substitute untrusted forwarding headers.
+Deno.serve((req, info) => handleIdentityApiRequest(req, { transportPeerIp: info.remoteAddr.hostname }));

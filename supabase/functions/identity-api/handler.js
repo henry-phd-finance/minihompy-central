@@ -2,6 +2,7 @@
  * Central Identity API Request Handler (ESM)
  */
 
+import { handleRelationships, relationshipReady } from "./relationships.js";
 import { getCorsHeaders, handleCorsPreflight } from "../_shared/cors.js";
 import { validateHandle, validateRelativePath } from "../_shared/validation.js";
 import { ApiError, readBody } from "../_shared/auth-proof.js";
@@ -132,7 +133,7 @@ export async function handleIdentityApiRequest(req, options) {
   // 1. GET /health - open to all origins without CORS restrictions
   if (path === "/health" && req.method === "GET") {
     return new Response(
-      JSON.stringify({ status: "ok", identity_protocol: 2, writing_protocol: 1, member_session_protocol: 2, navigation_protocol: 1, timestamp: new Date().toISOString() }),
+      JSON.stringify({ status: "ok", identity_protocol: 2, writing_protocol: 1, member_session_protocol: 2, navigation_protocol: 1, relationship_protocol: await relationshipReady(await resolveSupabaseClient(options)) ? 1 : 0, timestamp: new Date().toISOString() }),
       {
         status: 200,
         headers: {
@@ -178,6 +179,10 @@ export async function handleIdentityApiRequest(req, options) {
   };
 
   try {
+    if (path.startsWith("/relationships/")) {
+      const result = await handleRelationships(req, path, {db:supabase, transportPeerIp:options?.transportPeerIp});
+      return new Response(JSON.stringify(result.body), {status:result.status, headers:{...headers,"Access-Control-Expose-Headers":"Retry-After",...result.headers}});
+    }
     if (isNavigationRequest(path, url.searchParams)) {
       const result = await handleNavigation(req, path, supabase);
       return new Response(JSON.stringify(result.body), { status: result.status, headers });
